@@ -9,7 +9,7 @@
  *
  */
 /*
- * Copyright 2018-2024 Broadcom. All rights reserved.
+ * $Copyright: Copyright 2018-2023 Broadcom. All rights reserved.
  * The term 'Broadcom' refers to Broadcom Inc. and/or its subsidiaries.
  * 
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
  * GNU General Public License for more details.
  * 
  * A copy of the GNU General Public License version 2 (GPLv2) can
- * be found in the LICENSES folder.
+ * be found in the LICENSES folder.$
  */
 
 #ifndef NGBDE_IOCTL_H
@@ -80,10 +80,7 @@
 #define NGBDE_IOC_PAXB_WIN_MAP  _IOW(NGBDE_IOC_MAGIC, 9, __u64)
 
 /*! Add interrupt ACK register for kernel to control. */
-#define NGBDE_IOC_IACK_REG_ADD  _IOW(NGBDE_IOC_MAGIC, 10, __u64)
-
-/*! Initialize kernel interrupt driver. */
-#define NGBDE_IOC_IRQ_INIT      _IOW(NGBDE_IOC_MAGIC, 11, __u64)
+#define NGBDE_IOC_INTR_ACK_REG_ADD   _IOW(NGBDE_IOC_MAGIC, 10, __u64)
 
 /*! \} */
 
@@ -94,18 +91,38 @@
 #define NGBDE_IOC_FAIL          ((__u32)-1)
 
 /*!
- * \name Compatibility features.
- *
- * This allows user mode applications to work with both current and
- * older kernel modules.
- *
- * \anchor NGBDE_COMPAT_xxx
+ * \name Device flags.
+ * \anchor NGBDE_DEV_F_xxx
  */
 
 /*! \{ */
 
-/*! Support for IRQ_INIT IOCTL command. */
-#define NGBDE_COMPAT_IRQ_INIT   (1 << 0)
+/*! Message-signaled interrupts, PCI interrupts are operating in MSI mode. */
+#define NGBDE_DEV_F_MSI         (1 << 0)
+
+/*! \} */
+
+/*!
+ * \name Interrupt control commands.
+ * \anchor NGBDE_ICTL_xxx
+ */
+
+/*! \{ */
+
+/*! Connect interrupt handler. */
+#define NGBDE_ICTL_INTR_CONN    0
+
+/*! Disconnect interrupt handler. */
+#define NGBDE_ICTL_INTR_DISC    1
+
+/*! Wait for interrupt. */
+#define NGBDE_ICTL_INTR_WAIT    2
+
+/*! Force waiting thread to return. */
+#define NGBDE_ICTL_INTR_STOP    3
+
+/*! Clear list of interrupt status/mask registers. */
+#define NGBDE_ICTL_REGS_CLR     4
 
 /*! \} */
 
@@ -114,9 +131,6 @@ struct ngbde_ioc_mod_info_s {
 
     /*! IOCTL version used by kernel module. */
     __u16 version;
-
-    /*! Compatibility options (\ref NGBDE_COMPAT_xxx). */
-    __u16 compat;
 };
 
 /*! Probing results. */
@@ -126,31 +140,13 @@ struct ngbde_ioc_probe_info_s {
     __u16 num_swdev;
 };
 
-/*!
- * \name Bus types.
- * \anchor NGBDE_DEV_BT_xxx
- */
-
-/*! \{ */
-
-/*! PCI bus. */
-#define NGBDE_DEV_BT_PCI        0
-
-/*! ARM AXI bus. */
-#define NGBDE_DEV_BT_AXI        1
-
-/*! \} */
-
 /*! Device information. */
 struct ngbde_ioc_dev_info_s {
 
-    /*! Device type (currently unused). */
-    __u8 device_type;
+    /*! Device type. */
+    __u16 type;
 
-    /*! Bus type (\ref NGBDE_DEV_BT_xxx). */
-    __u8 bus_type;
-
-    /*! Device flags (currently unused). */
+    /*! Device flags (\ref NGBDE_DEV_F_xxx). */
     __u16 flags;
 
     /*! Vendor ID (typically the PCI vendor ID). */
@@ -219,89 +215,42 @@ struct ngbde_ioc_phys_addr_s {
     __u32 size;
 };
 
-/*!
- * Initialize kernel interrupt driver.
- *
- * The user mode driver will provide the number of desired interrupt
- * lines, and the kernel mode driver will respond with the actual
- * number of interrupt lines available (which may be a smaller
- * number).
- */
-struct ngbde_ioc_irq_init_s {
-
-    /*! Maximum number of interrupt lines per device. */
-    __u32 irq_max;
-};
-
-/*!
- * \name Interrupt control commands.
- * \anchor NGBDE_ICTL_xxx
- */
-
-/*! \{ */
-
-/*! Connect interrupt handler. */
-#define NGBDE_ICTL_INTR_CONN    0
-
-/*! Disconnect interrupt handler. */
-#define NGBDE_ICTL_INTR_DISC    1
-
-/*! Wait for interrupt. */
-#define NGBDE_ICTL_INTR_WAIT    2
-
-/*! Force waiting interrupt thread to return. */
-#define NGBDE_ICTL_INTR_STOP    3
-
-/*! Clear list of interrupt status/mask registers. */
-#define NGBDE_ICTL_REGS_CLR     4
-
-/*! \} */
-
-/*! Interrupt control operation. */
+/*! Interrupt control operation */
 struct ngbde_ioc_intr_ctrl_s {
 
     /*! Interrupt instance for this device. */
     __u32 irq_num;
 
-    /*! Interrupt control command (see \ref NGBDE_ICTL_xxx). */
+    /*! Interrupt control command. */
     __u32 cmd;
 };
 
 /*!
  * \name Interrupt register access flags.
- * \anchor NGBDE_IRQ_REG_F_xxx
+ * \anchor NGBDE_DEV_IRQ_REG_F_xxx
  */
 
 /*! \{ */
 
 /*! IRQ register is of type "write 1 to clear". */
-#define NGBDE_IRQ_REG_F_W1TC    (1 << 0)
+#define NGBDE_DEV_IRQ_REG_F_W1TC        (1 << 0)
 
 /*! IRQ status register is a bitwise AND of mask and raw status. */
-#define NGBDE_IRQ_REG_F_MASKED  (1 << 1)
+#define NGBDE_DEV_IRQ_REG_F_MASKED      (1 << 1)
 
 /*!
- * Indicates that the interrupts in the kmask field should be handled
- * by the kernel (typically the KNET kernel network driver). The
- * remaining interrupts in the interrupt register (if any) will be
- * handled by the user mode interrupt driver, except if \ref
- * NGBDE_IRQ_REG_F_UMASK is set, in which case the remaining
- * interrupts in the kmask will be ignored.
+ * Indicates that the kmask value is valid. This is mainly to
+ * distinguish a mask value of zero from the mask value being
+ * uninitialized, as this matters during a warm boot.
  */
-#define NGBDE_IRQ_REG_F_KMASK   (1 << 2)
-
-/*!
- * Indicates that the interrupts in the umask field should be handled
- * by the user mode interrupt handler.
- */
-#define NGBDE_IRQ_REG_F_UMASK   (1 << 3)
+#define NGBDE_DEV_IRQ_REG_F_KMASK       (1 << 2)
 
 /*! \} */
 
 /*! Add interrupt register information. */
 struct ngbde_ioc_irq_reg_add_s {
 
-    /*! Interrupt line associated with these registers. */
+    /*! Interrupt instance for this device. */
     __u32 irq_num;
 
     /*! Interrupt status register address offset. */
@@ -310,40 +259,27 @@ struct ngbde_ioc_irq_reg_add_s {
     /*! Interrupt mask register address offset. */
     __u32 mask_reg;
 
-    /*!
-     * Indicates which kernel mode interrupts in the interrupt
-     * registers that are associated with this interrupt line (\c
-     * irq_num). Note that the \ref NGBDE_IRQ_REG_F_xxx flags may
-     * affect how this value is interpreted.
-     */
+    /*! Interrupt mask for interrupts handled by the kernel. */
     __u32 kmask;
 
-    /*! Flags for special handling (\ref NGBDE_IRQ_REG_F_xxx). */
+    /*! Flags for special handling (\ref NGBDE_DEV_IRQ_REG_F_xxx). */
     __u32 flags;
-
-    /*!
-     * Indicates which user mode interrupts in the interrupt registers
-     * that are associated with this interrupt line (\c irq_num). Note
-     * that the \ref NGBDE_IRQ_REG_F_xxx flags may affect how this
-     * value is interpreted.
-     */
-    __u32 umask;
 };
 
 /*!
  * \name Interrupt ACK register access flags.
- * \anchor NGBDE_IACK_REG_F_xxx
+ * \anchor NGBDE_DEV_INTR_ACK_F_xxx
  */
 
 /*! \{ */
 
 /*! ACK registers resides in PCI bridge I/O window. */
-#define NGBDE_IACK_REG_F_PAXB   (1 << 0)
+#define NGBDE_DEV_INTR_ACK_F_PAXB   (1 << 0)
 
 /*! \} */
 
 /*! Add interrupt ACK register information. */
-struct ngbde_ioc_iack_reg_add_s {
+struct ngbde_ioc_intr_ack_reg_add_s {
 
     /*! Interrupt instance for this device. */
     __u32 irq_num;
@@ -351,10 +287,10 @@ struct ngbde_ioc_iack_reg_add_s {
     /*! Interrupt ACK register address offset. */
     __u32 ack_reg;
 
-    /*! Interrupt ACK register value to write. */
+    /*! Interrupt ACK value. */
     __u32 ack_val;
 
-    /*! Interrupt ACK register access flags (\ref NGBDE_IACK_REG_F_xxx). */
+    /*! Flags to indicate ack_reg resides in PCI bridge window. */
     __u32 flags;
 };
 
@@ -399,17 +335,14 @@ union ngbde_ioc_op_s {
     /*! Get a physical memory address associated with a switch device. */
     struct ngbde_ioc_phys_addr_s phys_addr;
 
-    /*! Get information about interrupt capabilities. */
-    struct ngbde_ioc_irq_init_s irq_init;
-
-    /*! Interrupt control command. */
+    /*! Interrupt control command (see \ref NGBDE_ICTL_xxx). */
     struct ngbde_ioc_intr_ctrl_s intr_ctrl;
 
     /*! Add interrupt status/mask register for kernel to control. */
     struct ngbde_ioc_irq_reg_add_s irq_reg_add;
 
     /*! Add interrupt ACK register for kernel to control. */
-    struct ngbde_ioc_iack_reg_add_s iack_reg_add;
+    struct ngbde_ioc_intr_ack_reg_add_s intr_ack_reg_add;
 
     /*! Write to a shared interrupt mask register. */
     struct ngbde_ioc_irq_mask_wr_s irq_mask_wr;
@@ -429,7 +362,6 @@ typedef struct ngbde_ioc_cmd_s {
 
     /*! IOCTL operation. */
     union ngbde_ioc_op_s op;
-
 } ngbde_ioc_cmd_t;
 
 #endif /* NGBDE_IOCTL_H */

@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 # $Id: Makefile,v 1.3 Broadcom SDK $
-# $Copyright: 2017-2024 Broadcom Inc. All rights reserved.
+# $Copyright: 2007-2023 Broadcom Inc. All rights reserved.
 # 
 # Permission is granted to use, copy, modify and/or distribute this
 # software under either one of the licenses below.
@@ -24,7 +24,6 @@
 # 
 # This software is governed by the Broadcom Open Network Switch APIs license:
 # https://www.broadcom.com/products/ethernet-connectivity/software/opennsa $
-# 
 # 
 #
 LOCALDIR = systems/linux/kernel/modules/bcm-knet
@@ -66,7 +65,6 @@ OBJECTS_COMPOSING = "bcm-knet.o gmodule.o"
 build: $(KMODULE)
 
 $(KMODULE): $(SRCS_COMPOSING)
-	mkdir -p $(BLDDIR)
 	rm -fr $(BLDDIR)/$(KERNEL_MODULE_DIR)
 	rm -f $(BLDDIR)/*.c
 	rm -f $(BLDDIR)/*.o
@@ -95,12 +93,13 @@ $(KMODULE): $(MODULE)
 	mkdir $(BLDDIR)/$(KERNEL_MODULE_DIR)
 	cp ${SDK}/make/Makefile.linux-kmodule $(BLDDIR)/$(KERNEL_MODULE_DIR)/Makefile
 	cat ${KBUILD_EXTRA_SYMBOLS} > $(BLDDIR)/$(KERNEL_MODULE_DIR)/Module.symvers
-	MOD_NAME=$(THIS_MOD_NAME) KBUILD_EXTRA_SYMBOLS="${KBUILD_EXTRA_SYMBOLS}" $(MAKE) -C $(BLDDIR)/$(KERNEL_MODULE_DIR) $(THIS_MOD_NAME).ko  
-
-# Make.depend is before clean:: so that Make.depend's clean:: runs first.
-include ${SDK}/make/Make.depend
+	MOD_NAME=$(THIS_MOD_NAME) KBUILD_EXTRA_SYMBOLS="${KBUILD_EXTRA_SYMBOLS}" $(MAKE) -C $(BLDDIR)/$(KERNEL_MODULE_DIR) $(THIS_MOD_NAME).ko
 # }
 endif
+
+# Make.depend is before clean:: so that Make.depend's clean:: runs first.
+
+include ${SDK}/make/Make.depend
 
 clean::
 	$(RM) $(BLDDIR)/version.c $(BLDDIR)/version.o

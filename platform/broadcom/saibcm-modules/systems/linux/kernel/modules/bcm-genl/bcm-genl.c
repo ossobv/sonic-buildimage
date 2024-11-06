@@ -1,5 +1,5 @@
 /*
- * $Copyright: 2017-2024 Broadcom Inc. All rights reserved.
+ * $Copyright: 2007-2023 Broadcom Inc. All rights reserved.
  * 
  * Permission is granted to use, copy, modify and/or distribute this
  * software under either one of the licenses below.
@@ -23,7 +23,6 @@
  * 
  * This software is governed by the Broadcom Open Network Switch APIs license:
  * https://www.broadcom.com/products/ethernet-connectivity/software/opennsa $
- * 
  * 
  */
 
@@ -211,7 +210,6 @@ _cleanup(void)
 #ifdef BUILD_GENL_PACKET
     bcmgenl_packet_cleanup();
 #endif
-
     bcmgenl_netif_cleanup();
     bcmgenl_dev_cleanup();
 
@@ -229,9 +227,10 @@ _init(void)
     bcmgenl_netif_init();
 
     bcmgenl_psample_init(BCMGENL_PROCFS_PATH);
-#ifdef BUILD_GENL_PACKET   
+#ifdef BUILD_GENL_PACKET
     bcmgenl_packet_init(BCMGENL_PROCFS_PATH);
 #endif
+
     return 0;
 }
 
