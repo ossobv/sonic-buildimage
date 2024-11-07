@@ -53,6 +53,8 @@ ARG SONIC_VERSION_CONTROL_COMPONENTS
 COPY ["buildinfo", "/usr/local/share/buildinfo"]
 COPY vcache/ /sonic/target/vcache/'${IMAGENAME}'
 RUN sed -i -e "s/debian-archive.trafficmanager.net/apt.osso.nl/g" $(find /etc/apt/sources.list /etc/apt/sources.list.d -type f)
+#ARG PIP_INDEX_URL="https://pypi.osso.nl/simple"
+#RUN pip3 config --global set global.index-url https://pypi.osso.nl/simple
 RUN dpkg -i /usr/local/share/buildinfo/sonic-build-hooks_1.0_all.deb
 ENV IMAGENAME='${IMAGENAME}'
 ENV DISTRO='${DISTRO}'
