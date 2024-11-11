@@ -10,5 +10,6 @@ $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	pushd ./librdb/
 	git checkout 2fdfc0c2bc914d643fe3f86e6715aeb843d8966e
 	git submodule update --init --recursive	
-	make -j$(SONIC_CONFIG_MAKE_JOBS)
+	# Set WARNS=... to work around https://github.com/redis/librdb/issues/55
+	make -j$(SONIC_CONFIG_MAKE_JOBS) WARNS='-Wall -Wextra -pedantic -flto=auto'
 	mv bin/rdb-cli $(DEST)/
