@@ -1,4 +1,7 @@
 #!/bin/bash
+# No special terminal positioning. Just print "building" and "finished" so we
+# can see what's going on and not have messages get lost/overwritten.
+export TERM=dumb
 
 lockfile .screen
 

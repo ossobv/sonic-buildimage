@@ -2,9 +2,12 @@
 
 NOJESSIE ?= 1
 NOSTRETCH ?= 1
-NOBUSTER ?= 0
+NOBUSTER ?= 1
+# For 202405 branch, we still need bullseye for docker-syncd-bcm.
+# The rest is bookworm.
 NOBULLSEYE ?= 0
 NOBOOKWORM ?= 0
+QUIET=n
 
 override Q := @
 ifeq ($(QUIET),n)

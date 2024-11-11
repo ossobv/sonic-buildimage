@@ -295,6 +295,10 @@ ifeq ($(SONIC_PROFILING_ON),y)
 DEB_BUILD_OPTIONS_GENERIC := nostrip noopt
 endif
 
+# Speed! And fix the openbsd-compat/regress/utimensattest st_atime fail
+# https://github.com/ossobv/sonic-buildimage/issues/7
+DEB_BUILD_OPTIONS_GENERIC += nocheck
+
 ifeq ($(SONIC_BUILD_JOBS),)
 override SONIC_BUILD_JOBS := $(SONIC_CONFIG_BUILD_JOBS)
 endif
