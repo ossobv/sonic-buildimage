@@ -25,6 +25,18 @@ COPY ["no-check-valid-until", "/etc/apt/apt.conf.d/"]
 
 {%- if CROSS_BUILD_ENVIRON != "y" %}
 COPY ["sources.list.{{ CONFIGURED_ARCH }}", "/etc/apt/sources.list"]
+# gcc-12 in bookworm has trouble with certain false positives. Prefer gcc-11
+# instead.
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006803
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1008630
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1032130
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106776
+# https://github.com/redis/librdb/issues/55
+RUN apt-get install -y gcc-11 g++-11 && \
+    update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 20 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-11 20 && \
+    update-alternatives --set cc /usr/bin/gcc-11 && \
+    update-alternatives --set c++ /usr/bin/g++-11
 {%- else %}
 COPY ["sources.list.amd64", "/etc/apt/sources.list"]
 {%- if CONFIGURED_ARCH == "armhf" %}
