@@ -9,7 +9,8 @@ $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	# Remove any stale files
 	rm -rf ./ipmitool-$(IPMITOOL_VERSION) ./ipmitool*.{deb,udeb,dsc,gz,xz}
 	# Obtain ipmitool
-	dget https://deb.debian.org/debian/pool/main/i/ipmitool/ipmitool_$(IPMITOOL_VERSION_FULL).dsc
+	# --allow-unauthenticated because 3A9E7D149697510A3E37CD95C38E8160A17841FE Aron Xu is not in keyring yet
+	dget --allow-unauthenticated https://deb.debian.org/debian/pool/main/i/ipmitool/ipmitool_$(IPMITOOL_VERSION_FULL).dsc
 	# Build source and Debian packages
 	pushd ipmitool-$(IPMITOOL_VERSION)
 
