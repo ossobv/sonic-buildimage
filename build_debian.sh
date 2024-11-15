@@ -500,6 +500,18 @@ set /files/etc/ssh/sshd_config/LogLevel VERBOSE
 save
 quit
 EOF
+# XXXWJD: quick fix; ideally we want this in a custom-build-thing
+# + we want this _inside_ every docker instance as well.
+sudo tee $FILESYSTEM_ROOT/etc/vim/vimrc.local >/dev/null <<'EOF'
+" Instead of auto-sourcing this afterwards, source it now.
+source \$VIMRUNTIME/defaults.vim
+let g:skip_defaults_vim = 1
+
+" Now we undo the "wrong" settings.
+set mouse=
+set noincsearch
+set nosi
+EOF
 # Configure sshd to listen for v4 and v6 connections
 sudo sed -i 's/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' $FILESYSTEM_ROOT/etc/ssh/sshd_config
 sudo sed -i 's/^#ListenAddress ::/ListenAddress ::/' $FILESYSTEM_ROOT/etc/ssh/sshd_config
