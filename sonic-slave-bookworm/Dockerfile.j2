@@ -589,7 +589,17 @@ RUN eatmydata apt-get install -y xsltproc
 RUN eatmydata apt-get -y build-dep isc-dhcp
 
 # Install vim
-RUN eatmydata apt-get install -y vim
+RUN eatmydata apt-get install -y vim && \
+# XXXWJD: vimrc.local
+    printf '%s\n' >/etc/vim/vimrc.local \
+        '" Instead of auto-sourcing this afterwards, source it now.' \
+        'source $VIMRUNTIME/defaults.vim' \
+        'let g:skip_defaults_vim = 1' \
+        '' \
+        '" Now we undo the "wrong" settings.' \
+        'set mouse=' \
+        'set noincsearch' \
+        'set nosi'
 
 # Install rsyslog
 RUN eatmydata apt-get install -y rsyslog
