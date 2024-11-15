@@ -456,7 +456,8 @@ sudo mkdir $FILESYSTEM_ROOT/etc/systemd/system/ssh.service.d
 sudo cp files/sshd/override.conf $FILESYSTEM_ROOT/etc/systemd/system/ssh.service.d/override.conf
 # Config sshd
 # 1. Set 'UseDNS' to 'no'
-# 2. Configure sshd to close all SSH connetions after 15 minutes of inactivity
+# 2. Configure sshd to close all SSH connetions after 5 minutes of inactivity
+# XXXWJD: disabled ClientAliveInterval back to 0 because we have this when devving
 sudo augtool -r $FILESYSTEM_ROOT <<'EOF'
 touch /files/etc/ssh/sshd_config/EmptyLineHack
 rename /files/etc/ssh/sshd_config/EmptyLineHack ""
@@ -468,7 +469,7 @@ rm /files/etc/ssh/sshd_config/ClientAliveInterval
 rm /files/etc/ssh/sshd_config/ClientAliveCountMax
 touch /files/etc/ssh/sshd_config/EmptyLineHack
 rename /files/etc/ssh/sshd_config/EmptyLineHack ""
-set /files/etc/ssh/sshd_config/ClientAliveInterval 300
+set /files/etc/ssh/sshd_config/ClientAliveInterval 0
 set /files/etc/ssh/sshd_config/ClientAliveCountMax 0
 ins #comment before /files/etc/ssh/sshd_config/ClientAliveInterval
 set /files/etc/ssh/sshd_config/#comment[following-sibling::*[1][self::ClientAliveInterval]] "Close inactive client sessions after 5 minutes"
