@@ -325,6 +325,11 @@ sudo LANG=C chroot $FILESYSTEM_ROOT useradd -G sudo,docker $USERNAME -c "$DEFAUL
 ## Create password for the default user
 echo "$USERNAME:$PASSWORD" | sudo LANG=C chroot $FILESYSTEM_ROOT chpasswd
 
+# XXXWJD/FIXME: add frr user at 300?
+# XXXWJD: drop bashrc so we take the default
+sudo rm $FILESYSTEM_ROOT/home/$USERNAME/.bashrc
+sudo rm $FILESYSTEM_ROOT/root/.bashrc
+
 ## Create redis group
 sudo LANG=C chroot $FILESYSTEM_ROOT groupadd -f redis
 sudo LANG=C chroot $FILESYSTEM_ROOT usermod -aG redis $USERNAME
