@@ -480,6 +480,7 @@ sudo cp files/sshd/override.conf $FILESYSTEM_ROOT/etc/systemd/system/ssh.service
 # Config sshd
 # 1. Set 'UseDNS' to 'no'
 # 2. Configure sshd to close all SSH connetions after 5 minutes of inactivity
+# XXXWJD: set AcceptEnv to none/empty against perl -esetlocale warnings
 # XXXWJD: disabled ClientAliveInterval back to 0 because we have this when devving
 sudo augtool -r $FILESYSTEM_ROOT <<'EOF'
 touch /files/etc/ssh/sshd_config/EmptyLineHack
@@ -487,6 +488,13 @@ rename /files/etc/ssh/sshd_config/EmptyLineHack ""
 set /files/etc/ssh/sshd_config/UseDNS no
 ins #comment before /files/etc/ssh/sshd_config/UseDNS
 set /files/etc/ssh/sshd_config/#comment[following-sibling::*[1][self::UseDNS]] "Disable hostname lookups"
+
+rm /files/etc/ssh/sshd_config/AcceptEnv
+touch /files/etc/ssh/sshd_config/EmptyLineHack
+rename /files/etc/ssh/sshd_config/EmptyLineHack ""
+set /files/etc/ssh/sshd_config/AcceptEnv/1 none
+ins #comment before /files/etc/ssh/sshd_config/AcceptEnv
+set /files/etc/ssh/sshd_config/#comment[following-sibling::*[1][self::AcceptEnv]] "No LANG and LC_ALL. They cause setlocale warnings"
 
 rm /files/etc/ssh/sshd_config/ClientAliveInterval
 rm /files/etc/ssh/sshd_config/ClientAliveCountMax
