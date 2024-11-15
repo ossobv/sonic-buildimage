@@ -874,6 +874,11 @@ if [ "${gid_user}" != "1000" ]; then
     die "expect gid 1000. current:${gid_user}"
 fi
 
+# XXXWJD/FIXME: add frr user at 300?
+# XXXWJD: drop bashrc so we take the default
+sudo rm $FILESYSTEM_ROOT/home/$USERNAME/.bashrc
+sudo rm $FILESYSTEM_ROOT/root/.bashrc
+
 # ALERT: This bit of logic tears down the qemu based build environment used to
 # perform builds for the ARM architecture. This must be the last step in this
 # script before creating the Sonic installer payload zip file.
