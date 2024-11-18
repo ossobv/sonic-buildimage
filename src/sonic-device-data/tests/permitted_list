@@ -75,6 +75,7 @@ module_64ports
 multicast_l2_r
 multicast_l2_range
 multicast_l3_range
+multi_hash_recurse_depth_vlan
 no_leds_proc
 num_ipv6_lpm_128b_entries
 os
