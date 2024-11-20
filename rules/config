@@ -129,10 +129,10 @@ INCLUDE_SYSTEM_GNMI = y
 INCLUDE_SYSTEM_EVENTD = y
 
 # INCLUDE_SYSTEM_TELEMETRY - build docker-sonic-telemetry for system telemetry support
-INCLUDE_SYSTEM_TELEMETRY = n
+INCLUDE_SYSTEM_TELEMETRY = y
 
 # INCLUDE_ICCPD - build docker-iccpd for mclag support
-INCLUDE_ICCPD = n
+INCLUDE_ICCPD = y
 
 # INCLUDE_SFLOW - build docker-sflow for sFlow support
 INCLUDE_SFLOW = y
